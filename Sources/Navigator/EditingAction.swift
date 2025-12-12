@@ -147,6 +147,20 @@ open class EditingActionsController {
 
     @available(iOS 13.0, *)
     func buildMenu(with builder: UIMenuBuilder) {
+        builder.insertSibling(
+             UIMenu(
+                title: "",
+                options: .displayInline,
+                children: [
+                    UIAction(
+                        title: "Explain")
+                         { _ in
+                            print("banana")
+                        }
+                    
+                ]
+             ), beforeMenu: .standardEdit
+        )
         if !canPerformAction(.lookup) {
             builder.remove(menu: .lookup)
         }
@@ -161,14 +175,14 @@ open class EditingActionsController {
     }
 
     func updateSharedMenuController() {
-        var items: [UIMenuItem] = []
-        if isEnabled, let selection = selection {
-            items = actions
-                .filter { delegate?.editingActions(self, canPerformAction: $0, for: selection) ?? true }
-                .compactMap(\.menuItem)
-        }
-        UIMenuController.shared.menuItems = items
-        UIMenuController.shared.update()
+    //     var items: [UIMenuItem] = []
+    //     if isEnabled, let selection = selection {
+    //         items = actions
+    //             .filter { delegate?.editingActions(self, canPerformAction: $0, for: selection) ?? true }
+    //             .compactMap(\.menuItem)
+    //     }
+    //     UIMenuController.shared.menuItems = items
+    //     UIMenuController.shared.update()
     }
 
     // MARK: - Copy
