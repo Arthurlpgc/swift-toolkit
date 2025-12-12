@@ -83,7 +83,7 @@ protocol EditingActionsControllerDelegate: AnyObject {
 }
 
 /// Handles the authorization and check of editing actions.
-final class EditingActionsController {
+open class EditingActionsController {
     weak var delegate: EditingActionsControllerDelegate?
 
     private let actions: [EditingAction]
