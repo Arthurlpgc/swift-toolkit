@@ -42,13 +42,26 @@ public struct EditingAction: Hashable {
     /// You need to implement the selector in one of your classes in the
     /// responder chain. Typically, in the `UIViewController` wrapping the
     /// navigator view controller.
-    public init(title: String, action: Selector) {
-        self.init(kind: .custom(UIMenuItem(title: title, action: action)))
+    public init(title: String, action: @escaping () -> Void) {
+        self.init(kind: .custom(
+            UIMenu(
+                title: "",
+                options: .displayInline,
+                children: [
+                    UIAction(
+                        title: title) { [action]
+                            _ in action()
+                        }
+                        
+                    
+                ]
+             )
+        ))
     }
 
     enum Kind: Hashable {
         case native([String])
-        case custom(UIMenuItem)
+        case custom(UIMenu)
     }
 
     let kind: Kind
@@ -57,16 +70,7 @@ public struct EditingAction: Hashable {
         self.kind = kind
     }
 
-    var actions: [Selector] {
-        switch kind {
-        case let .native(actions):
-            return actions.map { Selector($0) }
-        case let .custom(item):
-            return [item.action]
-        }
-    }
-
-    var menuItem: UIMenuItem? {
+    var menuItem: UIMenu? {
         switch kind {
         case .native:
             return nil
@@ -113,7 +117,7 @@ open class EditingActionsController {
     }
 
     func canPerformAction(_ action: EditingAction) -> Bool {
-        action.actions.contains { canPerformAction($0) }
+        true
     }
 
     func canPerformAction(_ selector: Selector) -> Bool {
@@ -126,7 +130,7 @@ open class EditingActionsController {
         guard
             isEnabled,
             let selection = selection,
-            let action = actions.first(where: { $0.actions.contains(selector) }),
+            let action = actions.first,
             isActionAllowed(action)
         else {
             return false
@@ -147,20 +151,14 @@ open class EditingActionsController {
 
     @available(iOS 13.0, *)
     func buildMenu(with builder: UIMenuBuilder) {
-        builder.insertSibling(
-             UIMenu(
-                title: "",
-                options: .displayInline,
-                children: [
-                    UIAction(
-                        title: "Explain")
-                         { _ in
-                            print("banana")
-                        }
-                    
-                ]
-             ), beforeMenu: .standardEdit
-        )
+        let menuItems: [UIMenu] = actions
+            .compactMap(\.menuItem)
+        if let firstItem = menuItems.first {
+            builder.insertSibling(firstItem, beforeMenu: .standardEdit)
+        }
+        for element in menuItems.dropFirst() {
+            builder.insertSibling(element, afterMenu: .standardEdit)
+        }
         if !canPerformAction(.lookup) {
             builder.remove(menu: .lookup)
         }
