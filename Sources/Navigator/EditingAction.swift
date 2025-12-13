@@ -42,14 +42,14 @@ public struct EditingAction: Hashable {
     /// You need to implement the selector in one of your classes in the
     /// responder chain. Typically, in the `UIViewController` wrapping the
     /// navigator view controller.
-    public init(title: String, action: @escaping () -> Void) {
+    public init(title: String, action: @escaping () -> Void, image: UIImage) {
         self.init(kind: .custom(
             UIMenu(
                 title: "",
                 options: .displayInline,
                 children: [
                     UIAction(
-                        title: title) { [action]
+                        title: title, image: image) { [action]
                             _ in action()
                         }
                         
@@ -157,13 +157,10 @@ open class EditingActionsController {
             builder.insertSibling(firstItem, beforeMenu: .standardEdit)
         }
         for element in menuItems.dropFirst() {
-            builder.insertSibling(element, afterMenu: .standardEdit)
+            builder.insertSibling(element, beforeMenu: .share)
         }
         if !canPerformAction(.lookup) {
             builder.remove(menu: .lookup)
-        }
-        if !canPerformAction(.share) {
-            builder.remove(menu: .share)
         }
 
         // Learn is removed as it seems bugged on iOS 17: it opens a Text
