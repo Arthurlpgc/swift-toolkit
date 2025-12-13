@@ -42,7 +42,7 @@ public struct EditingAction: Hashable {
     /// You need to implement the selector in one of your classes in the
     /// responder chain. Typically, in the `UIViewController` wrapping the
     /// navigator view controller.
-    public init(title: String, action: @escaping () -> Void, image: UIImage) {
+    public init(title: String, action: @escaping () -> Void, image: UIImage? = nil) {
         self.init(kind: .custom(
             UIMenu(
                 title: "",
